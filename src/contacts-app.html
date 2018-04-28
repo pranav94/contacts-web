@@ -20,20 +20,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="contacts-icons.html">
+<link rel="import" href="../bower_components/paper-search/paper-search-bar.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 
-<link rel="lazy-import" href="my-view1.html">
-<link rel="lazy-import" href="my-view2.html">
-<link rel="lazy-import" href="my-view3.html">
+<link rel="lazy-import" href="contact-list.html">
+<link rel="lazy-import" href="frequent-contacts.html">
+<link rel="lazy-import" href="contact-info.html">
+<link rel="lazy-import" href="my-settings.html">
 <link rel="lazy-import" href="my-view404.html">
 
 <dom-module id="contacts-app">
   <template>
     <style>
       :host {
-        --app-primary-color: #4285f4;
-        --app-secondary-color: black;
-
+        --app-primary-color: #f04437;
+        --app-secondary-color: #818181;
         display: block;
       }
 
@@ -44,6 +46,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app-header {
         color: #fff;
         background-color: var(--app-primary-color);
+        z-index: 1;
       }
 
       app-header paper-icon-button {
@@ -56,16 +59,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .drawer-list a {
         display: block;
-        padding: 0 16px;
+        padding: 12px 24px;
         text-decoration: none;
         color: var(--app-secondary-color);
         line-height: 40px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .drawer {
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .drawer-list a iron-icon {
+        --iron-icon-height: 18px;
+        --iron-icon-width: 18px;
+        margin-right: 10px;
       }
 
       .drawer-list a.iron-selected {
-        color: black;
-        font-weight: bold;
+        color: var(--app-primary-color);
+        background: #f5f5f5;
       }
+
+      .header-title {
+        -webkit-font-smoothing: antialiased;
+        width: 100%;
+      }
+
+      .header-title a {
+        text-decoration: none;
+        color: #efefef;
+      }
+
+      .closed-drawer-main {
+        width: 120%;
+        margin-left: -20%;
+        transition-duration: 200ms;
+        transition-property: width, margin-left ;
+      }
+
+      .opened-drawer-main {
+        width: 100%;
+        margin-left: 0;
+        transition-duration: 200ms;
+        transition-property: width, margin-left ;
+      }
+
+      paper-search-bar {
+        color: #efefef;
+        max-width: 45%;
+      }
+
     </style>
 
     <app-location
@@ -80,39 +125,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         tail="{{subroute}}">
     </app-route>
 
-    <app-drawer-layout fullbleed narrow="{{narrow}}">
-      <!-- Drawer content -->
-      <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="view1" href="[[rootPath]]view1">View One</a>
-          <a name="view2" href="[[rootPath]]view2">View Two</a>
-          <a name="view3" href="[[rootPath]]view3">View Three</a>
-        </iron-selector>
-      </app-drawer>
 
       <!-- Main content -->
-      <app-header-layout has-scrolling-region>
+  <app-header-layout has-scrolling-region>
 
-        <app-header slot="header" condenses reveals effects="waterfall">
-          <app-toolbar>
-            <paper-icon-button icon="contacts-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>My App</div>
-          </app-toolbar>
-        </app-header>
+      <app-header>
+        <app-toolbar>
+          <paper-icon-button icon="menu" on-tap="openDrawer"></paper-icon-button>
+          <div class="header-title">
+            <a href="[[rootPath]]contact-list">
+            Contacts
+            </a>
+          </div>
+          <paper-search-bar></paper-search-bar>
+        </app-toolbar>
+      </app-header>
 
-        <iron-pages
+      <app-drawer-layout>
+          <!-- Drawer content -->
+          <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+            <div class="drawer">
+              <app-toolbar></app-toolbar>
+              <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation" selected="contact-list">
+                <a name="contact-list" href="[[rootPath]]contact-list">
+                  <iron-icon icon="communication:contacts"></iron-icon>
+                  Contacts
+                </a>
+                <a name="frequent-contacts" href="[[rootPath]]frequent-contacts">
+                  <iron-icon icon="history"></iron-icon>
+                  Frequently Contacted
+                </a>
+                <hr></hr>
+                <a name="my-settings" href="[[rootPath]]my-settings">
+                  <iron-icon icon="icons:settings"></iron-icon>
+                  Settings
+                </a>
+              </iron-selector>
+            </div>
+          </app-drawer>
+          <div id="main">
+            <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
             fallback-selection="view404"
             role="main">
-          <my-view1 name="view1"></my-view1>
-          <my-view2 name="view2"></my-view2>
-          <my-view3 name="view3"></my-view3>
-          <my-view404 name="view404"></my-view404>
-        </iron-pages>
-      </app-header-layout>
-    </app-drawer-layout>
+              <contact-list name="contact-list"></contact-list>
+              <frequent-contacts name="frequent-contacts"></frequent-contacts>
+              <my-settings name="my-settings"></my-settings>
+              <contact-info name="contact-info"></contact-info>
+              <my-view404 name="view404"></my-view404>
+            </iron-pages>
+          </div>
+        </app-drawer-layout>
+    </app-header-layout>
+
   </template>
 
   <script>
@@ -147,7 +213,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _routePageChanged(page) {
         // If no page was found in the route data, page will be an empty string.
         // Default to 'view1' in that case.
-        this.page = page || 'view1';
+        this.page = page || 'contact-list';
 
         // Close a non-persistent drawer when the page & route are changed.
         if (!this.$.drawer.persistent) {
@@ -157,12 +223,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _pageChanged(page) {
         // Load page import on demand. Show 404 page if fails
-        const resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        const resolvedPageUrl = this.resolveUrl(page + '.html');
         Polymer.importHref(
             resolvedPageUrl,
             null,
             this._showPage404.bind(this),
             true);
+      }
+
+      openDrawer() {
+        this.$.drawer.toggle();
+        var main = Polymer.dom(this.root).querySelector('#main');
+        if(this.$.drawer.opened) {
+          main.classList = ["opened-drawer-main"];
+        } else if(this.$.drawer.persistent){
+          main.classList = ["closed-drawer-main"];
+        }
       }
 
       _showPage404() {

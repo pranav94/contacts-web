@@ -1,0 +1,94 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/paper-contact/paper-contact.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/mp-calendar/mp-calendar.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="contact-info">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            .contact-info {
+                display: inline;
+                margin-left: 15px;
+            }
+
+            .contact-info h1 {
+                display: inline
+            }
+
+            mp-calendar {
+                --header-bg: #f04437;
+                --header-icon-bg: #efefef;
+                --main-header-color: #efefef;
+            }
+
+        </style>
+        <!-- app-location binds to the app's URL -->
+        <app-location route="{{route}}"></app-location>
+
+        <!-- this app-route manages the top-level routes -->
+        <app-route route="{{route}}" pattern="/contact-info/:id" data="{{routeData}}"></app-route>
+        <iron-ajax auto="" url="http://127.0.0.1:8000/api/contacts/[[routeData.id]]" handle-as="json" last-response="{{contact}}">
+        </iron-ajax>
+        <div class="card">
+            <div>
+                <div class="circle">{{getCharAtZero(contact.first_name)}}</div>
+                <div class="contact-info">
+                    <h1>[[contact.first_name]] [[contact.last_name]]</h1>
+                </div>
+            </div>
+            <hr></hr>
+            <paper-contact-list style="width: 300px;">
+                <template is="dom-if" if="{{contact.email}}">
+                    <paper-contact-email>[[contact.email]]</paper-contact-email>
+                </template>
+                <template is="dom-if" if="{{contact.work_phone}}">
+                    <paper-contact-phone>[[contact.work_phone]]</paper-contact-phone>
+                </template>
+                <template is="dom-if" if="{{contact.cell_phone}}">
+                    <paper-contact-mobile>[[contact.cell_phone]]</paper-contact-mobile>
+                </template>
+                <template is="dom-if" if="{{contact.skype}}">
+                    <paper-contact-skype>[[contact.skype]]</paper-contact-skype>
+                </template>
+                <template is="dom-if" if="{{contact.address}}">
+                    <paper-contact-address latitude="[[contact.latitude]]" longitude="[[contact.longitude]]">[[contact.address]]</paper-contact-address>
+                </template>
+            </paper-contact-list>
+            <mp-calendar
+                        day-labels='["Su","Mo","Tu","We","Th","Fr","Sa"]'
+                        disable-prev-days
+                        show-days-in-month=42
+                        disabled-days='["Sa", "Su"]'>
+            </mp-calendar>
+        </div>
+    </template>
+
+    <script>
+        class ContactInfo extends Polymer.Element {
+            static get is() {
+                return 'contact-info';
+            }
+            getCharAtZero(name) {
+                return name.charAt(0);
+            }
+        }
+        window.customElements.define(ContactInfo.is, ContactInfo);
+    </script>
+</dom-module>
