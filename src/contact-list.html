@@ -1,15 +1,12 @@
 <!--
 @license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+Copyright (c) 2018 
+Author: Pranav Udupa S
 -->
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-search/paper-search-bar.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="contact-list">
@@ -20,8 +17,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 10px;
       }
 
+      .contact-card {
+        margin: 10px;
+      }
+
       .contact-card .circle {
         position: absolute;
+        height: 50px;
+        width: 50px;
+        font-size: 30px;
+        line-height: 52px;
       }
 
       .contact-info {
@@ -29,24 +34,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin-left: 85px;
       }
 
-      .contact-info h1 {
-        margin-top: 0px
+      .contact-info h2 {
+        margin-top: 2px;
+        margin-bottom: 2px;
+        font-size: 15px;
       }
 
+      .contact-info span {
+        font-size: 12px;
+      }
     </style>
     <iron-ajax auto="" url="http://127.0.0.1:8000/api/contacts/" handle-as="json" last-response="{{contactsResponse}}">
     </iron-ajax>
-      <template is="dom-repeat" items="[[contactsResponse]]">
-        <a href="[[rootPath]]contact-info/[[item.id]]" style="text-decoration:none">
-          <div class="card contact-card">
-            <div class="circle">{{getCharAtZero(item.first_name)}}</div>
-            <div class="contact-info">
-              <h1>[[item.first_name]] [[item.last_name]]</h1>
-              <span>[[item.email]]</span>
-            </div>
+    <paper-search-bar on-query-changed="search"></paper-search-bar>
+    <template is="dom-repeat" id="contactList" items="[[contactsResponse]]" filter="isSearch" sort="_sort" rendered-item-count="{{renderedCount}}">
+      <a href="[[rootPath]]contact-info/[[item.id]]" style="text-decoration:none">
+        <div class="card contact-card">
+          <div class="circle">{{getCharAtZero(item.first_name)}}</div>
+          <div class="contact-info">
+            <h2>[[item.first_name]] [[item.last_name]]</h2>
+            <span>[[item.email]]</span>
           </div>
-        </a>
-      </template>
+        </div>
+      </a>
+    </template>
+    <template is="dom-if" if="{{!renderedCount}}">
+      <div class="card">
+        No contacts found.
+      </div>
+    </template>
   </template>
 
   <script>
@@ -54,9 +70,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       static get is() {
         return 'contact-list';
       }
-      getCharAtZero(name) {
-        return name.charAt(0);
+
+      static get properties() {
+        return {
+          filter: {
+            type: String,
+            reflectToAttribute: true,
+            observer: 'redraw_contact_list'
+          },
+        };
       }
+
+      redraw_contact_list() {
+        this.$.contactList.render()
+      }
+
+      isSearch(contact) {
+        for (let key in contact) {
+          let value = contact[key].toString();
+          if (value.indexOf(this.filter) != -1) {
+            return true;
+          }
+        }
+      }
+
+      getCharAtZero(name) {
+          return name.charAt(0);
+        }
+
+      search(event) {
+        this.filter = event.detail.value;
+      }
+
+      _sort(a, b) {
+        return a.first_name < b.first_name ? -1 : 1;
+      }
+
     }
     window.customElements.define(ContactList.is, ContactList);
   </script>

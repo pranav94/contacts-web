@@ -1,11 +1,7 @@
 <!--
 @license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+Copyright (c) 2018 
+Author: Pranav Udupa S
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
@@ -20,7 +16,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-search/paper-search-bar.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 
@@ -34,8 +29,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
       :host {
-        --app-primary-color: #f04437;
-        --app-secondary-color: #818181;
+        --app-primary-color: #e74c3c;
+        --app-secondary-color: #7f8c8d;
         display: block;
       }
 
@@ -44,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       app-header {
-        color: #fff;
+        color: white;
         background-color: var(--app-primary-color);
         z-index: 1;
       }
@@ -64,11 +59,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: var(--app-secondary-color);
         line-height: 40px;
         font-size: 13px;
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .drawer {
-        border-right: 1px solid #e0e0e0;
+        border-right: 1px solid rgba(189, 195, 199,0.5);
       }
 
       .drawer-list a iron-icon {
@@ -82,14 +77,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background: #f5f5f5;
       }
 
+      .drawer-list a:hover {
+        background: #f5f5f5;
+      }
+
       .header-title {
         -webkit-font-smoothing: antialiased;
         width: 100%;
+        font-weight: 500;
       }
 
       .header-title a {
         text-decoration: none;
         color: #efefef;
+      }
+
+      .account a {
+        text-decoration: none;
+        color: #efefef;
+      }
+
+      .account iron-icon {
+        height: 35px;
+        margin-left: 15px;
+        width: 35px;
+        color: #818181;
+        background: white;
+        border-radius: 50%;
       }
 
       .closed-drawer-main {
@@ -107,8 +121,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       paper-search-bar {
-        color: #efefef;
+        color: #818181;;
         max-width: 45%;
+      }
+
+      hr {
+        border: 0.7px solid rgba(189, 195, 199,0.5);
       }
 
     </style>
@@ -127,17 +145,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
       <!-- Main content -->
-  <app-header-layout has-scrolling-region>
+  <app-header-layout>
 
-      <app-header>
+      <app-header  effects="waterfall">
         <app-toolbar>
-          <paper-icon-button icon="menu" on-tap="openDrawer"></paper-icon-button>
+          <paper-icon-button icon="menu" on-tap="openDrawer" style="height:40px; width:45px;"></paper-icon-button>
           <div class="header-title">
             <a href="[[rootPath]]contact-list">
             Contacts
             </a>
           </div>
-          <paper-search-bar></paper-search-bar>
+          <div class="account"><a href="[[rootPath]]my-settings"><iron-icon icon="icons:account-circle"></iron-icon></a></div>
         </app-toolbar>
       </app-header>
 
@@ -169,7 +187,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="view404"
             role="main">
-              <contact-list name="contact-list"></contact-list>
+              <contact-list name="contact-list" filter="{{filter}}"></contact-list>
               <frequent-contacts name="frequent-contacts"></frequent-contacts>
               <my-settings name="my-settings"></my-settings>
               <contact-info name="contact-info"></contact-info>
@@ -196,6 +214,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             reflectToAttribute: true,
             observer: '_pageChanged',
           },
+          filter: {
+            type: String,
+            reflectToAttribute: true
+          },
           routeData: Object,
           subroute: Object,
           // This shouldn't be neccessary, but the Analyzer isn't picking up
@@ -212,7 +234,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _routePageChanged(page) {
         // If no page was found in the route data, page will be an empty string.
-        // Default to 'view1' in that case.
+        // Default to 'contact-list' in that case.
         this.page = page || 'contact-list';
 
         // Close a non-persistent drawer when the page & route are changed.
